@@ -7,7 +7,7 @@ class Noticia {
     }
 
     public function criarNoticia($titulo, $noticia, $data, $imagem) {
-        $autor = $_SESSION['usuario_nome'];
+        $autor = $_SESSION['usuario_id'];
         $query = "INSERT INTO " . $this->table_name . " (titulo, noticia, data, autor, imagem) VALUES (?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
 

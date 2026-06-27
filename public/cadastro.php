@@ -10,16 +10,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $senha = $_POST['senha'];
     $imagem = $_POST['imagem'];
     $usuario->criarUsuario($nome, $email, $senha, $imagem);
-    $alert=true;
+    $alert = true;
 }
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <title>Adicionar Usuário</title>
 </head>
+
 <body>
+    <?php include '../contents/header.html'; ?>
+
     <h1>Adicionar Usuário</h1>
     <form method="POST">
         <label for="nome">Nome:</label>
@@ -37,7 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="submit" value="Adicionar">
         <br><br>
         <p>Já tem uma conta? <a href="./login.php">Faça login aqui</a></p>
-        <?php if (isset($alert) && $alert) echo '<p>Usuário adicionado com sucesso!</p>'; ?>
+        <?php if (isset($alert) && $alert)
+            echo '<p>Usuário adicionado com sucesso!</p>'; ?>
+
     </form>
+    <?php include '../contents/footer.html'; ?>
 </body>
+
 </html>

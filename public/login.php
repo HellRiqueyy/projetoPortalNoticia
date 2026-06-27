@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
 
-
+<?php include '../contents/header.html'; ?>
     <div class="container">
 
 
@@ -55,9 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p>Não tem uma conta? <a href="./cadastro.php">Registre-se aqui</a></p>
             <div class="mensagem">
                 <?php if (isset($mensagem_erro)) echo '<p>' . $mensagem_erro . '</p>'; ?>
+                
             </div>
         </div>
-
+<?php include '../contents/footer.html'; ?>
 
 </body>
 

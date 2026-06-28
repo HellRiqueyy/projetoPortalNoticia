@@ -1,48 +1,61 @@
 <?php
 session_start();
 include_once __DIR__ . '/../config/config.php';
+include_once __DIR__ . '/../classes/usuario.php';
 
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: ../public/login.php');
     exit;
 }
 
-$stmt = $conexao->prepare('SELECT nivel FROM usuarios WHERE id = ?');
-$stmt->bind_param('i', $_SESSION['usuario_id']);
-$stmt->execute();
-$result = $stmt->get_result();
-$currentUser = $result->fetch_assoc();
+$usuarioModel = new Usuario($conexao);
+$currentUser = $usuarioModel->lerPorIdUsuario($_SESSION['usuario_id']);
 
-if (!$currentUser || $currentUser['nivel'] !== 'admin') {
+if (!$currentUser || !$usuarioModel->ehAdmin($_SESSION['usuario_id'])) {
     die('Acesso negado.');
 }
 
-$usuarios = $conexao->query('SELECT id, nome, email, nivel FROM usuarios');
+$usuarios = $usuarioModel->lerUsuarios();
 ?>
 <!DOCTYPE html>
-<html>
-<head><title>Gerenciar Usuários</title></head>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Usuários</title>
+    <link rel="stylesheet" href="../assets/css/base.css">
+</head>
 <body>
-    <h2>Gerenciamento de Usuários</h2>
-    <a href="../private/dashboard.php">⬅ Voltar ao Painel</a>
-    <table border="1" style="width: 100%; margin-top: 20px;">
-        <tr>
-            <th>Nome</th>
-            <th>E-mail</th>
-            <th>Nível</th>
-            <th>Ações</th>
-        </tr>
-        <?php while($u = $usuarios->fetch_assoc()): ?>
-        <tr>
-            <td><?= htmlspecialchars($u['nome']); ?></td>
-            <td><?= htmlspecialchars($u['email']); ?></td>
-            <td><?= htmlspecialchars($u['nivel']); ?></td>
-            <td>
-                <a href="editar_usuarios.php?id=<?= $u['id'] ?>">Editar</a> | 
-                <a href="excluir_usuarios.php?id=<?= $u['id'] ?>">Excluir</a>
-            </td>
-        </tr>
-        <?php endwhile; ?>
-    </table>
+    <?php include '../contents/header.html'; ?>
+
+    <main class="container">
+        <section class="card">
+            <h2>Gerenciamento de Usuários</h2>
+            <p>Administre os perfis da equipe editorial e os acessos do portal.</p>
+            <a class="btn" href="../private/dashboard.php">⬅ Voltar ao Painel</a>
+
+            <table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+                <tr style="background: #fff3e0;">
+                    <th style="padding: 12px; border: 1px solid #e8d8c7;">Nome</th>
+                    <th style="padding: 12px; border: 1px solid #e8d8c7;">E-mail</th>
+                    <th style="padding: 12px; border: 1px solid #e8d8c7;">Nível</th>
+                    <th style="padding: 12px; border: 1px solid #e8d8c7;">Ações</th>
+                </tr>
+                <?php while($u = $usuarios->fetch_assoc()): ?>
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #e8d8c7;"><?= htmlspecialchars($u['nome']); ?></td>
+                    <td style="padding: 12px; border: 1px solid #e8d8c7;"><?= htmlspecialchars($u['email']); ?></td>
+                    <td style="padding: 12px; border: 1px solid #e8d8c7;"><?= htmlspecialchars($u['nivel']); ?></td>
+                    <td style="padding: 12px; border: 1px solid #e8d8c7;">
+                        <a href="editar_usuarios.php?id=<?= $u['id'] ?>">Editar</a> |
+                        <a href="excluir_usuarios.php?id=<?= $u['id'] ?>">Excluir</a>
+                    </td>
+                </tr>
+                <?php endwhile; ?>
+            </table>
+        </section>
+    </main>
+
+    <?php include '../contents/footer.html'; ?>
 </body>
 </html>

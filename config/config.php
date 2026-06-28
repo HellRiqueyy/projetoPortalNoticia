@@ -25,24 +25,42 @@ $sqlCriarTabelaUsuarios = "CREATE TABLE IF NOT EXISTS `usuarios` (
   `email` varchar(255) NOT NULL,
   `senha` varchar(255) NOT NULL,
   `foto` varchar(255) DEFAULT NULL,
+  `nivel` enum('admin','user') NOT NULL DEFAULT 'user',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`),
-    `nivel` enum('admin','user') NOT NULL DEFAULT 'user'
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
 
 if (!$conexao->query($sqlCriarTabelaUsuarios)) {
     die("Falha ao criar tabela usuarios: " . $conexao->error);
 }
 
+// 2. TABELA DE NOTÍCIAS (Corrigido AUTO_INCREMENT e SET NULL)
 $sqlCriarTabela = "CREATE TABLE IF NOT EXISTS `noticias` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT, -- Adicionado AUTO_INCREMENT para não dar erro ao inserir
   `titulo` varchar(255) NOT NULL,
   `noticia` text NOT NULL,
   `data` datetime DEFAULT current_timestamp(),
-  `autor` int(11) DEFAULT NULL,
-  `imagem` varchar(255) DEFAULT NULL
+  `autor` int(11) DEFAULT NULL, -- Mudado para DEFAULT NULL para o comando abaixo funcionar
+  `imagem` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`autor`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL -- Ajustado para o padrão correto do MySQL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
 
+if (!$conexao->query($sqlCriarTabela)) {
+    die("Falha ao criar tabela noticias: " . $conexao->error);
+}
+
+// 3. TABELA DE COMENTÁRIOS (Corrigido AUTO_INCREMENT, TEXT e SET NULL)
+$sqlCriarTabelaComentario = "CREATE TABLE IF NOT EXISTS `comentarios` (
+    `id` int(11) NOT NULL AUTO_INCREMENT, -- Adicionado AUTO_INCREMENT
+    `comentario` text NOT NULL, -- Removido o (1000) do TEXT, que causava erro de sintaxe
+    `autor` int(11) DEFAULT NULL, -- Mudado para DEFAULT NULL para aceitar o SET NULL abaixo
+    `data` datetime DEFAULT current_timestamp(),
+    `noticia` int (11) DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`noticia`) REFERENCES `noticias` (`id`) ON DELETE SET NULL,
+    FOREIGN KEY (`autor`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL -- Ajustado para o padrão correto do MySQL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;";
 if (!$conexao->query($sqlCriarTabela)) {
     die("Falha ao criar tabela noticias: " . $conexao->error);
 }

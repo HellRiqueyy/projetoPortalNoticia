@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $senha = $_POST['senha'];
     $imagem = $_POST['imagem'];
-    $usuario->registrar($nome, $email, $senha);
+    $usuario->criarUsuario($nome, $email, $senha);
     $alert = true;
 }
 ?>

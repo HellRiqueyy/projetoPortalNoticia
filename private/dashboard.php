@@ -1,12 +1,18 @@
 <?php
 session_start();
 include_once __DIR__ . '/../config/config.php';
-include_once __DIR__ . '/../classes/Noticia.php';
+include_once __DIR__ .'/../classes/Noticia.php';
 $noticiaModel = new Noticia($conexao);
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: ../public/login.php');
     exit;
 }
+
+//$stmt = $conexao->prepare('SELECT nome, nivel FROM usuarios WHERE id = ?');
+//$stmt->bind_param('i', $_SESSION['usuario_id']);
+//$stmt->execute();
+//$result = $stmt->get_result();
+//$usuario = $result->fetch_assoc();
 
 if (!$usuario) {
     session_destroy();
@@ -20,7 +26,6 @@ $nivel = $_SESSION['usuario_nivel'];
 
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +33,6 @@ $nivel = $_SESSION['usuario_nivel'];
     <link rel="stylesheet" href="../assets/css/base.css">
     <link rel="stylesheet" href="../assets/css/dashboard.css">
 </head>
-
 <body>
     <?php include '../contents/header.html'; ?>
 
@@ -40,6 +44,7 @@ $nivel = $_SESSION['usuario_nivel'];
                     <p>Gerencie suas publicações e acompanhe o que está em destaque.</p>
                 </div>
                 <div class="dashboard-actions">
+                    <a class="btn btn-profile" href="perfil.php">Meu perfil</a>
                     <a class="btn" href="nova_noticia.php">Nova notícia</a>
                     <?php if ($nivel === 'admin'): ?>
                         <a class="btn" href="../admin/usuarios.php">Gerenciar usuários</a>
@@ -53,13 +58,10 @@ $nivel = $_SESSION['usuario_nivel'];
                 <?php $resultadoNoticias = $noticiaModel->lerNoticiasPorAutor(); ?>
                 <?php while ($noticia = $resultadoNoticias->fetch_assoc()): ?>
                     <article class="post-card">
-                        <a href="../public/noticia.php?id=<?php echo htmlspecialchars($noticia['id']); ?>">
-                            <h4><?php echo htmlspecialchars($noticia['titulo']); ?></h4>
-                        </a>
-                        <p><?php echo nl2br(htmlspecialchars($noticiaModel->resumirTexto($noticia['noticia'], 100))); ?></p>
+                        <h4><?php echo htmlspecialchars($noticia['titulo']); ?></h4>
+                        <p><?php echo nl2br(htmlspecialchars($noticiaModel->resumirTexto($noticia['noticia'],100))); ?></p>
                         <?php if (!empty($noticia['imagem'])): ?>
-                            <img class="post-card__image" src="<?php echo htmlspecialchars($noticia['imagem']); ?>"
-                                alt="Imagem da notícia" width="200">
+                            <img class="post-card__image" src="<?php echo htmlspecialchars($noticiaModel->resolverImagemUrl($noticia['imagem'])); ?>" alt="Imagem da notícia" width="200">
                         <?php endif; ?>
                         <div class="dashboard-actions" style="margin-top: 12px;">
                             <a class="btn" href="editar_noticia.php?id=<?php echo $noticia['id']; ?>">Editar</a>
@@ -73,5 +75,4 @@ $nivel = $_SESSION['usuario_nivel'];
 
     <?php include '../contents/footer.html'; ?>
 </body>
-
 </html>
